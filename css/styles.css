@@ -3,7 +3,7 @@
 
 body,td,th,p{
 	font-family: Arial, Helvetica, sans-serif;
-	font-size: 10pt;
+	font-size: 16px;
 	color: #333;
 	line-height: 1.5;
 }
@@ -41,6 +41,7 @@ article, aside, canvas, details, figcaption, figure, footer, header, hgroup, men
 }
 #footer {
   background-color: #444;
+  box-sizing: border-box;
   color: #aaa;
   font-size: 8pt;
   letter-spacing: 1px;
@@ -54,8 +55,11 @@ nav {
   height: 80px;
   background-color: #252831;
   text-align:center;
+  display: table;
 }
 nav h1 {
+  display: table-cell;
+  vertical-align: middle;
   margin: auto;
 }
 nav h1 a {
@@ -109,6 +113,7 @@ nav h1 a {
   height: 50px;
   background-color: #3397DB;
   align-items: center;
+  overflow: hidden;
 }
 .filter-options h2 {
   color: white;
@@ -116,6 +121,8 @@ nav h1 a {
   font-weight: normal;
   line-height: 1;
   margin: 0 20px;
+  padding-top: 18px;
+  padding-bottom: 18px;
 }
 .filter-options select {
   background-color: white;
@@ -218,7 +225,7 @@ nav h1 a {
   line-height: 1.1;
 }
 #restaurant-img {
-	width: 90%;
+	width: 100%;
 }
 #restaurant-address {
   font-size: 12pt;
@@ -234,11 +241,12 @@ nav h1 a {
   padding: 2px 0;
   text-align: center;
   text-transform: uppercase;
-	width: 90%;
+	width: 100%;
 }
 #restaurant-container, #reviews-container {
   border-bottom: 1px solid #d9d9d9;
   border-top: 1px solid #fff;
+  box-sizing: border-box;
   padding: 140px 40px 30px;
   width: 50%;
 }
@@ -265,11 +273,194 @@ nav h1 a {
   overflow: hidden;
   padding: 0 20px 20px;
   position: relative;
-  width: 85%;
+  width: 100%;
 }
 #reviews-list li p {
   margin: 0 0 10px;
 }
+
+#reviews-list li .header {
+    background-color: #333333;
+    color: #FFF;
+    display: table;
+    width: 100%;
+  }
+
+  #reviews-list li .header p {
+    display: table-cell;
+    color: #FFF;
+  }
+
+  #reviews-list li {
+    padding: 0;
+  }
+
+  #reviews-list li .header {
+    padding: 15px 30px;
+    box-sizing: border-box;
+    border-top-left-radius: 20px;
+  }
+
+  #reviews-list li .header .reviewer-name {
+
+  }
+
+  #reviews-list li .header .review-date {
+    text-align: right;
+    font-size: 14px;
+    color: #CCCCCC;
+    text-shadow: 1px 1px 1px black;
+  }
+
+  #reviews-list li .review-rating {
+    background-color: #FFA134;
+    display: inline-block;
+    text-transform: uppercase;
+    font-size: 15px;
+    color: #FFF;
+    border-radius: 3px;
+    padding: .3em .5em;
+  }
+
+  #reviews-list li .review-content {
+    padding: 20px;
+  }
 #restaurant-hours td {
   color: #666;
+}
+
+/********************************
+* BREAKPOINTS
+*********************************/
+
+@media screen and (min-width: 641px) {
+  .filter-options h2 {
+    float: left;
+    padding: 18px 0;
+  }
+
+  #restaurants-list {
+    max-width: 1100px;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  #restaurants-list li {
+    display: inline-block;
+    flex-direction: row;
+  }  
+}
+
+
+
+@media screen and (min-width: 481px) and (max-width: 780px) {
+  #restaurants-list {
+    overflow: hidden;
+  }
+
+  #restaurants-list li {
+    width: 100%;
+    min-height: 120px;
+    box-sizing: border-box;
+    overflow: hidden;
+    margin: 15px 0;
+    padding: 15px;
+  }
+
+  #restaurants-list li h1 {
+    margin-top: 0;
+  }
+
+  #restaurants-list .restaurant-img {
+    max-width: 200px;
+    min-width: 180px;
+    min-height: 100%;
+    padding: 0;
+    margin-right: 20px;
+    float: left;
+  }
+}
+
+@media screen and (max-width: 992px) {
+  #maincontent {
+    padding-bottom: 80px;
+  }
+
+  #breadcrumb {
+    width: 100%;
+  }
+
+  .inside #map-container {
+    width: 100%;
+    height: 40vh;
+    position: relative;
+  }
+
+  #restaurant-container,
+  #reviews-container {
+    width: 100%;
+    padding: 100px 20px 30px;
+    overflow: hidden;
+  }
+
+  #reviews-container {
+    padding-top: 40px;
+  }
+
+  #restaurant-img {
+    width: 50%;
+    float: left;
+    margin-right: 20px;
+  }
+
+  #restaurant-cuisine {
+    float: left;
+    width: 50%;
+  } 
+
+  .inside #footer {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+@media screen and (max-width: 640px) {
+
+  nav h1 a {
+    font-size: 18px;
+    letter-spacing: 5px;
+  }
+
+  #breadcrumb {
+    padding: 10px 15px 16px;
+    font-size: 20px;
+  }
+
+  .filter-options {
+    height: auto;
+  }
+
+  #restaurants-list li {
+    margin: 15px auto;
+  }
+
+  #restaurant-container {
+    box-sizing: border-box;
+  }
+
+  #restaurant-img {
+    width: 100%;
+    border-top-left-radius: 30px;
+  }
+
+  #restaurant-cuisine {
+    width: 100%;
+  }
+
+  #reviews-list li {
+    width: 100%;
+  }
 }
