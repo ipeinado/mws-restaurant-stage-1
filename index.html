@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -18,14 +18,18 @@
 
   <main id="maincontent">
     <section id="map-container">
+      <h2 class="visually-hidden">Map of restaurant locations</h2>
       <div id="map"></div>
     </section>
     <section>
+      <h2 class="visually-hidden">List of restaurants</h2>
       <div class="filter-options">
-        <h2>Filter Results</h2>
+        <h3>Filter Results</h3>
+        <label for="neighborhoods-select" class="visually-hidden">Select a neighborhood</label>
         <select id="neighborhoods-select" name="neighborhoods" onchange="updateRestaurants()">
           <option value="all">All Neighborhoods</option>
         </select>
+        <label for="cuisines-select" class="visually-hidden">Select a type of cuisine</label>
         <select id="cuisines-select" name="cuisines" onchange="updateRestaurants()">
           <option value="all">All Cuisines</option>
         </select>
@@ -37,7 +41,7 @@
   <script type="application/javascript" charset="utf-8" src="js/dbhelper.js"></script>
   <script type="application/javascript" charset="utf-8" src="js/main.js"></script>
   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCqVIS10YN2lIIHcRZbLWDtyK5_GD9QkWg&libraries=places&callback=initMap"></script>
-  <script type="application/javascript" charset="utf-8" src="sw.js"></script>
+  <!-- <script type="application/javascript" charset="utf-8" src="sw.js"></script> -->
 
 
   <footer id="footer">
