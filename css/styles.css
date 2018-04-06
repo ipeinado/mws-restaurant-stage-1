@@ -81,6 +81,10 @@ nav h1 a {
     font-size: 17px;
     margin: 0;
     width: calc(50% - 80px);
+    text-align: left;
+    position: absolute;
+    top: 80px;
+    left: 0;
 }
 
 /* Display list items side by side */
@@ -259,7 +263,7 @@ nav h1 a {
 #reviews-container {
   padding: 30px 40px 80px;
 }
-#reviews-container h2 {
+#reviews-container h3 {
   color: #D43900;
   font-size: 24pt;
   font-weight: 300;

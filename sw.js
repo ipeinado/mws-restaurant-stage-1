@@ -1,6 +1,8 @@
 const CACHE_NAME = 'restaurants-review-cache-v1';
 var urlsToCache = [
 	'/',
+	'/index.html',
+	'/restaurant.html',
 	'/css/styles.css',
 	'/data/restaurants.json',
 	'/js/dbhelper.js',
@@ -39,11 +41,11 @@ var urlsToCache = [
 ];
 
 if ('serviceWorker' in navigator) {
-	window.addEventListener('load', function() {
-		navigator.serviceWorker.register('/sw.js').then(function(registration) {
+	window.addEventListener('load', () => {
+		navigator.serviceWorker.register('/sw.js').then((registration) => {
 			// Registration was successful
 			console.log('ServiceWorker registration successful with scope: ', registration.scope);
-		}, function(err) {
+		}, (err) => {
 			// Registration failed
 			console.log('ServiceWorker registration failed: ', err);
 		});
@@ -61,21 +63,21 @@ self.addEventListener('install', (event) => {
 	);
 });
 
-self.addEventListener('fetch', function(event) {
-	let request = event.request;
+self.addEventListener('fetch', (event) => {
+	const request = event.request;
 	event.respondWith(
 		caches.match(request)
-			.then(function(response) {
+			.then((response) => {
 				if (response) {
 					return response;
 				}
-				return fetch(request).then(function(response) {
+				return fetch(request).then((response) => {
 					var responseToCache = response.clone();
 					caches.open(CACHE_NAME).then(function(cache) {
 						cache.put(request, responseToCache).catch(function(err) {
 							console.warn(request.url + ' ' + err.message);
 						});
-					}).catch(function(err) {
+					}).catch((err) => {
 						console.warn("Error in ", request, err);
 					});
 					return response;
