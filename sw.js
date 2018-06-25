@@ -1,10 +1,10 @@
 const CACHE_NAME = 'restaurants-review-cache-v1';
 var urlsToCache = [
 	'/',
+	'/manifest.json',
 	'/index.html',
 	'/restaurant.html',
 	'/css/styles.css',
-	'/data/restaurants.json',
 	'js/idb.js',
 	'/js/dbhelper.js',
 	'/js/main.js',
@@ -38,7 +38,9 @@ var urlsToCache = [
 	'/img/9-small@2x.jpg',
 	'/img/10.jpg',
 	'/img/10-small.jpg',
-	'/img/10-small@2x.jpg'
+	'/img/10-small@2x.jpg',
+	'/img/udacity-logo-192.png',
+	'/img/udacity-logo-512.png'
 ];
 
 if ('serviceWorker' in navigator) {
@@ -52,6 +54,7 @@ if ('serviceWorker' in navigator) {
 		});
 	});
 }
+
 
 self.addEventListener('install', (event) => {
 	// Perform install steps

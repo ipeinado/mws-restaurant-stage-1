@@ -1,0 +1,20 @@
+{
+	"short_name": "Restaurants",
+	"name": "Restaurants",
+	"icons": [
+		{
+			"src": "/img/udacity-logo-512.png",
+			"type": "image/png",
+			"sizes": "512x512"
+		},
+		{
+			"src": "/img/udacity_logo-192.png",
+			"type": "image/png",
+			"sizes": "192x192"
+		}
+	],
+	"start_url": "/",
+	"background_color": "#f3f3f3",
+	"theme_color": "#333333",
+	"display": "standalone"
+}

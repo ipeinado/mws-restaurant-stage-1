@@ -2,7 +2,6 @@
  * Common database helper functions.
  */
 class DBHelper {
-
   /**
    * Database URL.
    * Change this to restaurants.json file location on your server.
@@ -12,18 +11,53 @@ class DBHelper {
     return `http://localhost:${port}/restaurants`;
   }
 
-  /**
-   * Fetch all restaurants.
-   */
+  static openDB() {
+    if (!('indexedDB' in window)) {
+      console.log('This browser doesn\'t support IndexedDB');
+      return;
+    }
+
+    const dbPromise =  idb.open('mws', 1, (upgradeDB) => {
+      console.log('Creating the products object store');
+      let restaurantsStore = upgradeDB.createObjectStore('restaurants', {keyPath: 'id'});
+      restaurantsStore.createIndex('cuisine_type', 'cuisine_type', {unique: false});
+      restaurantsStore.createIndex('neighborhood', 'neighborhood', {unique: false});
+    });
+
+    return dbPromise;
+  }
+
   static fetchRestaurants(callback) {
+
+    const dbPromise = DBHelper.openDB();
+
     const url = DBHelper.DATABASE_URL;
-    console.log(url);
+
     fetch(url)
       .then(response => response.json())
-      .then(restaurantsJson => callback(null, restaurantsJson))
+      .then(restaurantsJson => {
+        console.log(restaurantsJson);
+        dbPromise
+          .then((db) => {
+            const tx = db.transaction('restaurants', 'readwrite');
+            const store = tx.objectStore('restaurants');
+            restaurantsJson.forEach((restaurant) => store.put(restaurant));
+            return tx.complete;
+          })
+          .then((event) => callback(null, restaurantsJson))
+          .catch((err) => console.log('Transaction not completed due to error: ', err));
+      })
       .catch(err => {
-        const error = (`Request failed. Error returned: ${err}`);
-        callback(error, null);
+        console.log(`Request failed. Error returned: ${err}`);
+        dbPromise
+          .then((db) => {
+            console.log('calling database');
+            const tx = db.transaction('restaurants', 'readonly');
+            const store = tx.objectStore('restaurants');
+            return store.getAll();
+          })
+          .then(restaurants => callback(null, restaurants))
+          .catch(err => callback(err, null));
       });
   }
 
