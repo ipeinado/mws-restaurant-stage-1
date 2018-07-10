@@ -11,6 +11,48 @@
   <link rel="stylesheet" href="css/styles.css" type="text/css">
   <link rel="manifest" href="/manifest.json">
   <title>Restaurant Info</title>
+  <style>
+    form {
+    }
+
+    form div + div {
+      margin-top: 1em;
+    }
+
+    label {
+      font-weight: bold;
+      font-size: 0.9em;
+      display: block;
+    }
+
+    input, textarea {
+      font: 1em sans-serif;
+      width: 100%;
+      box-shadow: inset 0 1px 2px 0 rgba(50,50,50,0.3);
+      padding: 0.5em;
+      border-radius: 3px;
+      border: 1px solid #dbdad5;
+      box-sizing: border-box;
+    }
+
+    input:focus, textarea:focus {
+      border-color: #000;
+    }
+
+    textarea {
+      vertical-align: top;
+      height: 5em;
+    }
+
+    .button {
+      font-size: 1em;
+      background-color: #d43900;
+      color: #fff;
+      padding: 1em;
+      border-radius: 5px;
+      margin-top: 1em;
+    }
+  </style>
 </head>
 
 <body class="inside">
@@ -50,6 +92,25 @@
     <!-- Beginning reviews -->
     <section id="reviews-container">
       <ul id="reviews-list"></ul>
+      <div id="reviews-form"></div>
+<!--       <h4>Add your review</h4>
+    <form action="http://localhost:1337/reviews/" method="post">
+        <div>
+          <label for="name">Name:</label>
+          <input type="text" id="name" name="name" required>
+        </div>
+        <div>
+          <label for="rating">Rating:</label>
+          <input type="number" id="rating" step="1" min="1" max="5" required>
+        </div>
+        <div>
+          <label for="comments">Comments:</label>
+          <textarea id="comments" name="comments"></textarea>
+        </div>
+        <div class="button">
+          <button type="submit">Submit your review</button> 
+        </div>
+      </form> -->
     </section>
     <!-- End reviews -->
   </main>
@@ -69,7 +130,7 @@
   <script type="text/javascript" src="js/restaurant_info.js"></script>
   <!-- Google Maps -->
   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCqVIS10YN2lIIHcRZbLWDtyK5_GD9QkWg&libraries=places&callback=initMap"></script>
-  <script type="application/javascript" charset="utf-8" src="sw.js"></script>
+  <!-- <script type="application/javascript" charset="utf-8" src="sw.js"></script> REMEMBER TO UNCOMMENT -->
   <!-- End scripts -->
 
 </body>

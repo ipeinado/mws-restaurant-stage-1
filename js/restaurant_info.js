@@ -97,18 +97,22 @@ fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => 
  * Create all reviews HTML and add them to the webpage.
  */
 fillReviewsHTML = (reviews = self.restaurant.reviews) => {
-  const container = document.getElementById('reviews-container');
+  const container = document.getElementById('reviews-container'),
+        ul = document.getElementById('reviews-list');
+  
   const title = document.createElement('h3');
   title.innerHTML = 'Reviews';
-  container.appendChild(title);
+
+  container.insertBefore(title, ul);
 
   if (!reviews) {
     const noReviews = document.createElement('p');
     noReviews.innerHTML = 'No reviews yet!';
-    container.appendChild(noReviews);
+    container.insertBefore(noReviews, ul);
+    createReviewForm(restaurant);
     return;
   }
-  const ul = document.getElementById('reviews-list');
+  
   reviews.forEach(review => {
     ul.appendChild(createReviewHTML(review));
   });
@@ -148,6 +152,105 @@ createReviewHTML = (review) => {
   content.appendChild(comments);
 
   return li;
+}
+
+/**
+* create reviewForm
+*/
+createReviewForm = (restaurant = self.restaurant) => {
+  const formContainer = document.getElementById('reviews-form');
+
+  const title = document.createElement('h4');
+  title.innerHTML = "Add your review";
+
+  formContainer.appendChild(title);
+
+  const form = document.createElement('form');
+  form.setAttribute('method', 'http://localhost:1337/reviews/');
+  form.setAttribute('action', 'post');
+
+  const hiddenId = document.createElement('input');
+  hiddenId.setAttribute('id', 'restaurant_id');
+  hiddenId.setAttribute('name', 'restaurant_id');
+  hiddenId.setAttribute('type', 'hidden');
+  hiddenId.setAttribute('value', restaurant.id);
+
+  form.appendChild(hiddenId);
+
+  const divName = document.createElement('div');
+
+  const labelName = document.createElement('label');
+  labelName.setAttribute('for', 'name');
+  labelName.innerHTML = 'Your Name';
+  divName.appendChild(labelName);
+
+  const inputName = document.createElement('input');
+  inputName.setAttribute('type', 'text');
+  inputName.setAttribute('id', 'name');
+  inputName.setAttribute('name', 'name');
+  inputName.setAttribute('required', '');
+  divName.appendChild(inputName);
+
+  form.appendChild(divName);
+
+  const divRating = document.createElement('div');
+
+  const labelRating = document.createElement('label');
+  labelRating.setAttribute('for', 'rating');
+  labelRating.innerHTML = 'Rating';
+  divRating.appendChild(labelRating);
+
+  const inputRating = document.createElement('input');
+  inputRating.setAttribute('type', 'number');
+  inputRating.setAttribute('id', 'rating');
+  inputRating.setAttribute('name', 'rating');
+  inputRating.setAttribute('step', 1);
+  inputRating.setAttribute('min', 1);
+  inputRating.setAttribute('max', 5);
+  divRating.appendChild(inputRating);
+
+  form.appendChild(divRating);
+
+  const divComments = document.createElement('div');
+
+  const labelComments = document.createElement('label');
+  labelComments.setAttribute('for', 'comments');
+  labelComments.innerHTML = 'Your comments';
+  divComments.appendChild(labelComments);
+
+  const inputComments = document.createElement('textarea');
+  inputComments.setAttribute('id', 'comments');
+  inputComments.setAttribute('name', 'comments');
+
+  divComments.appendChild(inputComments);
+  form.appendChild(divComments);
+
+  const divButton = document.createElement('div');
+
+  const submitButton = document.createElement('button');
+  submitButton.setAttribute('type', 'submit');
+  submitButton.setAttribute('id', 'submit');
+  submitButton.setAttribute('class', 'button');
+  submitButton.setAttribute('role', 'button');
+  submitButton.innerHTML = 'Submit your review';
+
+  form.appendChild(submitButton);
+
+  form.addEventListener('submit', submitReview);
+
+  formContainer.appendChild(form);
+}
+
+submitReview = (event) => {
+  event.preventDefault();
+  const data = {
+    restaurant_id: event.srcElement[0].value,
+    name: document.getElementById('name').value,
+    rating: document.getElementById('rating').value,
+    comments: document.getElementById('comments').value
+  }
+
+  console.log(data);
 }
 
 /**
