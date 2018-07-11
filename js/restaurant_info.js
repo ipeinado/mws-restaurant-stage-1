@@ -71,6 +71,9 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   }
   // fill reviews
   fillReviewsHTML();
+
+  // create review form
+  createReviewForm();
 }
 
 /**
@@ -96,7 +99,7 @@ fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => 
 /**
  * Create all reviews HTML and add them to the webpage.
  */
-fillReviewsHTML = (reviews = self.restaurant.reviews) => {
+fillReviewsHTML = (restaurant = self.restaurant) => {
   const container = document.getElementById('reviews-container'),
         ul = document.getElementById('reviews-list');
   
@@ -105,18 +108,30 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
 
   container.insertBefore(title, ul);
 
-  if (!reviews) {
-    const noReviews = document.createElement('p');
-    noReviews.innerHTML = 'No reviews yet!';
-    container.insertBefore(noReviews, ul);
-    createReviewForm(restaurant);
-    return;
-  }
+  fetch('http://localhost:1337/reviews/?restaurant_id=' + restaurant.id)
+    .then(response => response.json())
+    .then(reviews => {
+      console.log(reviews);
+      if (!reviews) {
+        const noReviews = document.createElement('p');
+        noReviews.innerHTML = 'No reviews yet!';
+        container.appendChild(noReviews);
+        return;
+      }
   
-  reviews.forEach(review => {
-    ul.appendChild(createReviewHTML(review));
-  });
-  container.appendChild(ul);
+      reviews.forEach(review => {
+        ul.appendChild(createReviewHTML(review));
+      });
+
+      container.appendChild(ul);
+    })
+    .catch(err => {
+      const noReviews = document.createElement('p');
+        noReviews.innerHTML = 'Sorry, there was a problem downloading the reviews';
+        container.appendChild(noReviews);
+        return;
+
+    })
 }
 
 /**
@@ -139,7 +154,8 @@ createReviewHTML = (review) => {
 
   const date = document.createElement('p');
   date.className = 'review-date';
-  date.innerHTML = review.date;
+  date.innerHTML = new Date(review.updatedAt).toLocaleDateString("en-US");
+  console.log(review.updatedAt);
   header.appendChild(date);
 
   const rating = document.createElement('p');
@@ -250,7 +266,18 @@ submitReview = (event) => {
     comments: document.getElementById('comments').value
   }
 
-  console.log(data);
+  fetch('http://localhost:1337/reviews/', {
+    method: 'post',
+    body: JSON.stringify(data)
+  })
+  .then(response => response.json())
+  .then(data => {
+    const review = createReviewHTML(data);
+    document.getElementById('reviews-list').appendChild(review);
+  })
+  .catch(err => {
+    let notification = new Notification("Hi there!");
+  });
 }
 
 /**
