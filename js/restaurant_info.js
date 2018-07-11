@@ -108,30 +108,26 @@ fillReviewsHTML = (restaurant = self.restaurant) => {
 
   container.insertBefore(title, ul);
 
-  fetch('http://localhost:1337/reviews/?restaurant_id=' + restaurant.id)
-    .then(response => response.json())
-    .then(reviews => {
-      console.log(reviews);
-      if (!reviews) {
-        const noReviews = document.createElement('p');
-        noReviews.innerHTML = 'No reviews yet!';
-        container.appendChild(noReviews);
-        return;
-      }
-  
-      reviews.forEach(review => {
-        ul.appendChild(createReviewHTML(review));
-      });
-
-      container.appendChild(ul);
-    })
-    .catch(err => {
+  DBHelper.fetchReviewsByRestaurant(restaurant.id, (error, reviews) => {
+    if (error) {
       const noReviews = document.createElement('p');
-        noReviews.innerHTML = 'Sorry, there was a problem downloading the reviews';
-        container.appendChild(noReviews);
-        return;
+      noReviews.innerHTML = 'Sorry, there was a problem downloading the reviews';
+      container.appendChild(noReviews);
+      return;
+    }
+    if (!reviews) {
+      const noReviews = document.createElement('p');
+      noReviews.innerHTML = 'No reviews yet!';
+      container.appendChild(noReviews);
+      return;
+    }
 
-    })
+    reviews.forEach(review => {
+      ul.appendChild(createReviewHTML(review));
+    });
+
+    container.appendChild(ul);
+  });
 }
 
 /**

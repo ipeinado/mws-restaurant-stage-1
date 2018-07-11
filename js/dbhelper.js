@@ -17,11 +17,19 @@ class DBHelper {
       return;
     }
 
-    const dbPromise =  idb.open('mws', 1, (upgradeDB) => {
-      console.log('Creating the products object store');
-      let restaurantsStore = upgradeDB.createObjectStore('restaurants', {keyPath: 'id'});
-      restaurantsStore.createIndex('cuisine_type', 'cuisine_type', {unique: false});
-      restaurantsStore.createIndex('neighborhood', 'neighborhood', {unique: false});
+    const dbPromise =  idb.open('mws', 2, (upgradeDB) => {
+      switch(upgradeDB.oldVersion) {
+        case 0:
+          console.log('Creating the products object store');
+          let restaurantsStore = upgradeDB.createObjectStore('restaurants', {keyPath: 'id'});
+          restaurantsStore.createIndex('cuisine_type', 'cuisine_type', {unique: false});
+          restaurantsStore.createIndex('neighborhood', 'neighborhood', {unique: false});
+        case 1:
+          console.log('Creating the reviews object store');
+          let reviewsStore = upgradeDB.createObjectStore('reviews', {keyPath: 'id'});
+          reviewsStore.createIndex('restaurant_id', 'restaurant_id', {unique: false});
+      }
+      
     });
 
     return dbPromise;
@@ -170,6 +178,59 @@ class DBHelper {
   }
 
   /**
+   * Fetch all reviews with proper error handling
+   */
+   static fetchReviews(callback) {
+
+    const dbPromise = DBHelper.openDB();
+
+    const url = 'http://localhost:1337/reviews/';
+
+    fetch(url)
+      .then(response => response.json())
+      .then(reviewsJson => {
+        console.log(reviewsJson);
+          dbPromise
+            .then((db) => {
+              const tx = db.transaction('reviews', 'readwrite');
+              const store = tx.objectStore('reviews');
+              reviewsJson.forEach((review) => store.put(review));
+              return tx.complete;
+            })
+            .then((event) => callback(null, reviewsJson))
+            .catch((err) => console.log('Transaction not completed due to error: ', err));
+      })
+      .catch(err => {
+        console.log(`Request failed. Error returned: ${err}`);
+          dbPromise
+            .then((db) => {
+              console.log('retrieving reviews from database');
+              const tx = db.transaction('reviews', 'readonly');
+              const store = tx.objectStore('reviews');
+              return store.getAll();
+            })
+            .then(reviews => callback(null, reviews))
+            .catch(err => callback(err, null));
+      });
+  }
+
+  /**
+   *
+   */
+   static fetchReviewsByRestaurant(restaurant_id, callback) {
+    // Fetch all restaurants
+    DBHelper.fetchReviews((error, reviews) => {
+      if (error) {
+        callback(error, null);
+      } else {
+        // Filter reviews with a specific restaurant id
+        const results = reviews.filter(r => r.restaurant_id == restaurant_id);
+        callback(null, results);
+      }
+    });
+   }
+
+  /**
    * Restaurant page URL.
    */
   static urlForRestaurant(restaurant) {
@@ -182,6 +243,13 @@ class DBHelper {
   static imageUrlForRestaurant(restaurant) {
     return (`/img/${restaurant.photograph}`);
   }
+
+  /**
+   * Restaurant reviews URL
+   */
+   static urlForReviews(restaurant) {
+    return (`./reviews/?restaurant_id=${restaurant.id}`);
+   }
 
   /**
    * Map marker for a restaurant.
