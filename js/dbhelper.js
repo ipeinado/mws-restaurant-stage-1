@@ -16,8 +16,7 @@ class DBHelper {
       console.log('This browser doesn\'t support IndexedDB');
       return;
     }
-
-    const dbPromise =  idb.open('mws', 2, (upgradeDB) => {
+    const dbPromise =  idb.open('mws', 1, (upgradeDB) => {
       switch(upgradeDB.oldVersion) {
         case 0:
           console.log('Creating the products object store');
@@ -26,10 +25,8 @@ class DBHelper {
           restaurantsStore.createIndex('neighborhood', 'neighborhood', {unique: false});
         case 1:
           console.log('Creating the reviews object store');
-          let reviewsStore = upgradeDB.createObjectStore('reviews', {keyPath: 'id'});
-          reviewsStore.createIndex('restaurant_id', 'restaurant_id', {unique: false});
+          let reviewsStore = upgradeDB.createObjectStore('reviews', {keyPath: 'id', autoIncrement: true});
       }
-      
     });
 
     return dbPromise;
@@ -44,16 +41,9 @@ class DBHelper {
     fetch(url)
       .then(response => response.json())
       .then(restaurantsJson => {
-        console.log(restaurantsJson);
-        dbPromise
-          .then((db) => {
-            const tx = db.transaction('restaurants', 'readwrite');
-            const store = tx.objectStore('restaurants');
-            restaurantsJson.forEach((restaurant) => store.put(restaurant));
-            return tx.complete;
-          })
-          .then((event) => callback(null, restaurantsJson))
-          .catch((err) => console.log('Transaction not completed due to error: ', err));
+        callback(null, restaurantsJson);
+        DBHelper.saveRestaurantsLocally(restaurantsJson)
+          .catch((err) => console.warn(err));
       })
       .catch(err => {
         console.log(`Request failed. Error returned: ${err}`);
@@ -178,44 +168,50 @@ class DBHelper {
   }
 
   /**
+   *  Store restaurants in local IDB
+   */
+  static saveRestaurantsLocally(restaurants) {
+    if (!('indexedDB' in window)) {return null;}
+    const dbPromise = DBHelper.openDB();
+
+    return dbPromise.then(db => {
+      const tx = db.transaction('restaurants', 'readwrite');
+      const store = tx.objectStore('restaurants');
+      return Promise.all(restaurants.map(restaurant => store.put(restaurant)))
+      .catch(err => {
+        throw Error("could not store restaurants in database");
+      })
+    });
+  }
+
+  /**
    * Fetch all reviews with proper error handling
    */
    static fetchReviews(callback) {
 
-    const dbPromise = DBHelper.openDB();
-
-    const url = 'http://localhost:1337/reviews/';
-
-    fetch(url)
-      .then(response => response.json())
-      .then(reviewsJson => {
-        console.log(reviewsJson);
-          dbPromise
-            .then((db) => {
-              const tx = db.transaction('reviews', 'readwrite');
-              const store = tx.objectStore('reviews');
-              reviewsJson.forEach((review) => store.put(review));
-              return tx.complete;
-            })
-            .then((event) => callback(null, reviewsJson))
-            .catch((err) => console.log('Transaction not completed due to error: ', err));
+    DBHelper.getServerReviews()
+      .then(reviewsFromNetwork => {
+        console.log("Getting reviews from network");
+        callback(null, reviewsFromNetwork);
+        DBHelper.saveReviewsLocally(reviewsFromNetwork)
+          .then(() => console.log('Data from network saved in local store'))
+          .catch((err) => console.warn(err));
       })
       .catch(err => {
-        console.log(`Request failed. Error returned: ${err}`);
-          dbPromise
-            .then((db) => {
-              console.log('retrieving reviews from database');
-              const tx = db.transaction('reviews', 'readonly');
-              const store = tx.objectStore('reviews');
-              return store.getAll();
-            })
-            .then(reviews => callback(null, reviews))
-            .catch(err => callback(err, null));
+        console.log('Network requests have failed, this is expected if offline');
+        DBHelper.getLocalReviews()
+          .then(offlineData => {
+            if (!offlineData.length) {
+              console.log("No data");
+            } else {
+              callback(null, offlineData);
+            }
+          });
       });
   }
 
   /**
-   *
+   * Fetch reviews by restaurant
    */
    static fetchReviewsByRestaurant(restaurant_id, callback) {
     // Fetch all restaurants
@@ -227,6 +223,48 @@ class DBHelper {
         const results = reviews.filter(r => r.restaurant_id == restaurant_id);
         callback(null, results);
       }
+    });
+   }
+
+   /**
+    * Get reviews from server
+    */
+    static getServerReviews() {
+      return fetch('http://localhost:1337/reviews')
+        .then(response => {
+          if (!response.ok) {
+            throw Error(response.statusText);
+          }
+          return response.json();
+        })
+    }
+
+   /**
+   * Save reviews in IndexedDB
+   */
+   static saveReviewsLocally(reviews) {
+    if (!('indexedDB' in window)) {return null;}
+    const dbPromise = DBHelper.openDB();
+
+    return dbPromise.then(db => {
+      const tx = db.transaction('reviews', 'readwrite');
+      const store = tx.objectStore('reviews');
+      return Promise.all(reviews.map(review => store.put(review)))
+        .catch((err) => {
+          throw Error('Reviews were not added to the store: ' + err);
+        })
+    });
+   }
+
+   /**
+   *  Get reviews from local database
+   */
+   static getLocalReviews() {
+    if (!('indexedDB' in window)) {return null;}
+    return DBHelper.openDB().then(db => {
+      const tx = db.transaction('reviews', 'readonly');
+      const store = tx.objectStore('events');
+      return store.getAll();
     });
    }
 

@@ -49,8 +49,11 @@ fetchRestaurantFromURL = (callback) => {
  * Create restaurant HTML and add it to the webpage
  */
 fillRestaurantHTML = (restaurant = self.restaurant) => {
+  console.log(restaurant);
   const name = document.getElementById('restaurant-name');
   name.innerHTML = restaurant.name;
+
+  setFavButton(restaurant);
 
   const address = document.getElementById('restaurant-address');
   address.innerHTML = restaurant.address;
@@ -75,6 +78,41 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   // create review form
   createReviewForm();
 }
+
+/**
+ * Add favorite button
+ */
+setFavButton = (restaurant = self.restaurant) => {
+  const favButton = document.getElementById("favButton");
+  if (restaurant.is_favorite) {
+    favButton.innerHTML = "Remove from favorites";
+  } else {
+    favButton.innerHTML = "Add to favorites";
+  }
+  favButton.addEventListener('click', favButtonClick);
+}
+
+/**
+ *  Click favorite button
+ */
+ favButtonClick = (event, restaurant = self.restaurant) => {
+  event.preventDefault();
+  restaurant.is_favorite = !restaurant.is_favorite;
+  setFavButton(restaurant);
+  
+  // Update in local
+  DBHelper.saveRestaurantsLocally([restaurant])
+    .catch(err => console.log(err));
+  
+  // Update in server
+  const headers = new Headers({'Content-Type': 'application/json'});
+  fetch(`http://localhost:1337/restaurants/${restaurant.id}/?is_favorite=${restaurant.is_favorite}`,
+    {method: 'put', headers: headers})
+    .then(response => console.log(response.statusText))
+    .catch(err => console.log(err));
+ } 
+
+
 
 /**
  * Create restaurant operating hours HTML table and add it to the webpage.
@@ -115,18 +153,22 @@ fillReviewsHTML = (restaurant = self.restaurant) => {
       container.appendChild(noReviews);
       return;
     }
-    if (!reviews) {
-      const noReviews = document.createElement('p');
-      noReviews.innerHTML = 'No reviews yet!';
-      container.appendChild(noReviews);
-      return;
+    console.log(reviews);
+    if (reviews.length > 0) {
+      updateReviews(reviews);
     }
+  });
+}
 
-    reviews.forEach(review => {
-      ul.appendChild(createReviewHTML(review));
-    });
-
-    container.appendChild(ul);
+/**
+* Update reviews
+*/
+updateReviews = (reviews) => {
+  const ul = document.getElementById('reviews-list');
+  
+  reviews.forEach(review => {
+    const item = createReviewHTML(review);
+    ul.appendChild(item);
   });
 }
 
@@ -151,7 +193,6 @@ createReviewHTML = (review) => {
   const date = document.createElement('p');
   date.className = 'review-date';
   date.innerHTML = new Date(review.updatedAt).toLocaleDateString("en-US");
-  console.log(review.updatedAt);
   header.appendChild(date);
 
   const rating = document.createElement('p');
@@ -248,12 +289,12 @@ createReviewForm = (restaurant = self.restaurant) => {
 
   form.appendChild(submitButton);
 
-  form.addEventListener('submit', submitReview);
+  form.addEventListener('submit', addAndPostReview);
 
   formContainer.appendChild(form);
 }
 
-submitReview = (event) => {
+addAndPostReview = (event) => {
   event.preventDefault();
   const data = {
     restaurant_id: event.srcElement[0].value,
@@ -262,18 +303,21 @@ submitReview = (event) => {
     comments: document.getElementById('comments').value
   }
 
+  console.log(data);
+
+  updateReviews([data]);
+  DBHelper.saveReviewsLocally([data])
+    .catch((err) => console.log(err));
+
+  const headers = new Headers({'Content-Type': 'application/json'});
+  const body = JSON.stringify(data);
+  
   fetch('http://localhost:1337/reviews/', {
     method: 'post',
-    body: JSON.stringify(data)
-  })
-  .then(response => response.json())
-  .then(data => {
-    const review = createReviewHTML(data);
-    document.getElementById('reviews-list').appendChild(review);
-  })
-  .catch(err => {
-    let notification = new Notification("Hi there!");
-  });
+    headers: headers,
+    body: body
+  }).then((response) => console.log("New data submitted to the server " + response.statusText))
+    .catch((err) => console.log(err));
 }
 
 /**
