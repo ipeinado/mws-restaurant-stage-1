@@ -16,20 +16,8 @@ class DBHelper {
       console.log('This browser doesn\'t support IndexedDB');
       return;
     }
-    const dbPromise =  idb.open('mws', 1, (upgradeDB) => {
-      switch(upgradeDB.oldVersion) {
-        case 0:
-          console.log('Creating the products object store');
-          let restaurantsStore = upgradeDB.createObjectStore('restaurants', {keyPath: 'id'});
-          restaurantsStore.createIndex('cuisine_type', 'cuisine_type', {unique: false});
-          restaurantsStore.createIndex('neighborhood', 'neighborhood', {unique: false});
-        case 1:
-          console.log('Creating the reviews object store');
-          let reviewsStore = upgradeDB.createObjectStore('reviews', {keyPath: 'id', autoIncrement: true});
-      }
-    });
 
-    return dbPromise;
+    return idb.open('mws', 1);
   }
 
   static fetchRestaurants(callback) {
@@ -263,7 +251,7 @@ class DBHelper {
     if (!('indexedDB' in window)) {return null;}
     return DBHelper.openDB().then(db => {
       const tx = db.transaction('reviews', 'readonly');
-      const store = tx.objectStore('events');
+      const store = tx.objectStore('reviews');
       return store.getAll();
     });
    }

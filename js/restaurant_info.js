@@ -49,7 +49,6 @@ fetchRestaurantFromURL = (callback) => {
  * Create restaurant HTML and add it to the webpage
  */
 fillRestaurantHTML = (restaurant = self.restaurant) => {
-  console.log(restaurant);
   const name = document.getElementById('restaurant-name');
   name.innerHTML = restaurant.name;
 
@@ -80,14 +79,16 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
 }
 
 /**
- * Add favorite button
+ * Set favorite button
  */
 setFavButton = (restaurant = self.restaurant) => {
   const favButton = document.getElementById("favButton");
   if (restaurant.is_favorite) {
-    favButton.innerHTML = "Remove from favorites";
+    favButton.innerHTML = "&#10084; Remove from favorites";
+    favButton.setAttribute('class', 'fav-button favorite');
   } else {
-    favButton.innerHTML = "Add to favorites";
+    favButton.innerHTML = "<span class='heart'>&#10084;</span> Add to favorites";
+    favButton.setAttribute('class', 'fav-button non-favorite');
   }
   favButton.addEventListener('click', favButtonClick);
 }
@@ -100,15 +101,14 @@ setFavButton = (restaurant = self.restaurant) => {
   restaurant.is_favorite = !restaurant.is_favorite;
   setFavButton(restaurant);
   
-  // Update in local
+  // Update record in local database
   DBHelper.saveRestaurantsLocally([restaurant])
     .catch(err => console.log(err));
   
-  // Update in server
+  // Update record in server
   const headers = new Headers({'Content-Type': 'application/json'});
   fetch(`http://localhost:1337/restaurants/${restaurant.id}/?is_favorite=${restaurant.is_favorite}`,
     {method: 'put', headers: headers})
-    .then(response => console.log(response.statusText))
     .catch(err => console.log(err));
  } 
 
@@ -153,17 +153,18 @@ fillReviewsHTML = (restaurant = self.restaurant) => {
       container.appendChild(noReviews);
       return;
     }
-    console.log(reviews);
+
+    // If there are any reviews
     if (reviews.length > 0) {
-      updateReviews(reviews);
+      updateReviewsUI(reviews);
     }
   });
 }
 
 /**
-* Update reviews
+* Update reviews in the restaurants page
 */
-updateReviews = (reviews) => {
+updateReviewsUI = (reviews) => {
   const ul = document.getElementById('reviews-list');
   
   reviews.forEach(review => {
@@ -294,30 +295,67 @@ createReviewForm = (restaurant = self.restaurant) => {
   formContainer.appendChild(form);
 }
 
-addAndPostReview = (event) => {
-  event.preventDefault();
-  const data = {
-    restaurant_id: event.srcElement[0].value,
-    name: document.getElementById('name').value,
-    rating: document.getElementById('rating').value,
-    comments: document.getElementById('comments').value
-  }
+postReview = (review) => {
+  delete review.is_pending;
 
-  console.log(data);
+  const headers = new Headers({'Accept': 'application/json', 'Content-Type': 'application/json; charset=utf-8'});
+  const body = JSON.stringify(review);
 
-  updateReviews([data]);
-  DBHelper.saveReviewsLocally([data])
-    .catch((err) => console.log(err));
-
-  const headers = new Headers({'Content-Type': 'application/json'});
-  const body = JSON.stringify(data);
-  
   fetch('http://localhost:1337/reviews/', {
     method: 'post',
+    mode: 'cors',
     headers: headers,
     body: body
-  }).then((response) => console.log("New data submitted to the server " + response.statusText))
-    .catch((err) => console.log(err));
+  }).then(response => {
+    // If the response is ok, remove the is_pending flag and update the record in the database
+    if ((response.status == 200) || (response.status == 201)) {
+      DBHelper.openDB().then(db => {
+        const tx = db.transaction('reviews', 'readwrite');
+        const store = tx.objectStore('reviews');
+        return store.put(review);
+      })
+    } else {
+      throw new Error('response status is not 200 or 201')
+    }
+  }).catch(err => console.log('Could not post the review: ' + err));
+}
+
+
+addAndPostReview = (event) => {
+  event.preventDefault();
+
+  const data = {
+    restaurant_id: parseInt(event.srcElement[0].value, 10),
+    name: document.getElementById('name').value,
+    rating: parseInt(document.getElementById('rating').value, 10),
+    comments: document.getElementById('comments').value,
+    is_pending: true
+  }
+
+  document.getElementById('name').value = '';
+  document.getElementById('rating').value = '';
+  document.getElementById('comments').value = '';
+
+  // append the review to the list
+  updateReviewsUI([data]);
+
+  // save the review in the local database
+  DBHelper.saveReviewsLocally([data])
+    .catch((err) => console.log('Could not save reviews locally' + err));
+
+  if ('serviceWorker' in navigator && 'SyncManager' in window) {
+    navigator.serviceWorker.ready
+      .then(reg => {
+        reg.sync.register('submitReviews');
+      })
+      .catch(err => {
+        // system was unable to register for a sync, send normal
+        postReview(data);
+      });
+  } else {
+    // if there is no service worker
+    postReview(data);
+  }
 }
 
 /**

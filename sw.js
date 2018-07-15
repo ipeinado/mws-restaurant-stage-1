@@ -67,6 +67,23 @@ self.addEventListener('install', (event) => {
 	);
 });
 
+self.addEventListener('activate', (event) => {
+	console.log('activating service worker');
+	self.importScripts('/js/idb.js');
+	event.waitUntil(
+		idb.open('mws', 1, (upgradeDB) => {
+	      switch(upgradeDB.oldVersion) {
+	        case 0:
+	          let restaurantsStore = upgradeDB.createObjectStore('restaurants', {keyPath: 'id'});
+	          restaurantsStore.createIndex('cuisine_type', 'cuisine_type', {unique: false});
+	          restaurantsStore.createIndex('neighborhood', 'neighborhood', {unique: false});
+	        case 1:
+	          let reviewsStore = upgradeDB.createObjectStore('reviews', {keyPath: 'id', autoIncrement: true});
+	      }
+	    })
+	)
+});
+
 self.addEventListener('fetch', (event) => {
 	const request = event.request;
 	event.respondWith(
@@ -89,3 +106,45 @@ self.addEventListener('fetch', (event) => {
 			})
 	);
 });
+
+self.addEventListener('sync', (event) => {
+	if (event.tag === 'submitReviews') {
+		event.waitUntil(submitReviews());
+	}
+});
+
+function getLocalReviews() {
+	return idb.open('mws', 1).then(db => {
+		const tx = db.transaction('reviews', 'readonly');
+		const store = tx.objectStore('reviews');
+		return store.getAll()
+	});
+}
+
+function submitReview(review) {
+	const headers = new Headers({'Accept': 'application/json', 'Content-Type': 'application/json; charset=utf-8'});
+  	const body = JSON.stringify(review);
+	return fetch('http://localhost:1337/reviews/', 
+		{
+			method: 'POST',
+			headers: headers,
+			body: body
+		});
+}
+
+function submitReviews() {
+	return getLocalReviews()
+		.then(reviews => {
+			return Promise.all(reviews.map(review => {
+				if (review.hasOwnProperty('is_pending')) {
+					console.log('Submitting pending reviews');
+					delete review.is_pending;
+					idb.open('mws', 1).then(db => {
+						const tx = db.transaction('reviews', 'readwrite');
+						const store = tx.objectStore('reviews');
+						return store.put(review)
+					}).then(() => { return submitReview() })
+				}
+			}))
+		});
+}
