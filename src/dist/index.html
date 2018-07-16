@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <meta name="theme-color" content="#333333">
+  <link rel="manifest" href="/manifest.json">
+  <style>
+    @charset "utf-8";body{font-family:Arial,Helvetica,sans-serif;font-size:16px;color:#333;line-height:1.5}body{background-color:#fdfdfd;margin:0;position:relative}ul{font-family:Arial,Helvetica,sans-serif;font-size:10pt;color:#333}a{color:#d43900;text-decoration:none}h1,h2,h3{font-family:Arial,Helvetica,sans-serif;margin:0 0 20px}footer,header,nav,section{display:block}#maincontent{background-color:#f3f3f3;min-height:100%}#footer{background-color:#444;box-sizing:border-box;color:#ccc;font-size:8pt;letter-spacing:1px;padding:25px;text-align:center;text-transform:uppercase}#footer a{color:#ff977a}nav{width:100%;height:80px;background-color:#252831;text-align:center;display:table}nav h1{display:table-cell;vertical-align:middle;margin:auto}nav h1 a{color:#fff;font-size:14pt;font-weight:200;letter-spacing:10px;text-transform:uppercase}#map{height:400px;width:100%;background-color:#ccc}.filter-options{width:100%;height:50px;background-color:#1e71a9;align-items:center;overflow:hidden}.filter-options h3{color:#fff;font-size:1rem;font-weight:400;line-height:1;margin:0 20px;padding-top:18px;padding-bottom:18px}.filter-options select{background-color:#fff;border:1px solid #fff;font-family:Arial,sans-serif;font-size:11pt;height:35px;letter-spacing:0;margin:10px;padding:0 10px;width:200px}#restaurants-list{background-color:#f3f3f3;list-style:outside none none;margin:0;padding:30px 15px 60px;text-align:center}@media screen and (min-width:641px){.filter-options h3{float:left;padding:18px 0}#restaurants-list{max-width:1100px;margin-left:auto;margin-right:auto;display:flex;flex-wrap:wrap;justify-content:center}}@media screen and (min-width:481px) and (max-width:780px){#restaurants-list{overflow:hidden}}@media screen and (max-width:992px){#maincontent{padding-bottom:80px}}@media screen and (max-width:640px){nav h1 a{font-size:18px;letter-spacing:5px}.filter-options{height:auto}}.visually-hidden{border:0;clip:rect(0 0 0 0);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;width:1px}
+  </style>
+  <link rel="preload" src="//normalize-css.googlecode.com/svn/trunk/normalize.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" src="//normalize-css.googlecode.com/svn/trunk/normalize.css"></noscript>
+  <link rel="preload" href="css/styles.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="css/styles.css"></noscript>
+  <script>!function(n){"use strict";n.loadCSS||(n.loadCSS=function(){});var o=loadCSS.relpreload={};if(o.support=function(){var e;try{e=n.document.createElement("link").relList.supports("preload")}catch(t){e=!1}return function(){return e}}(),o.bindMediaToggle=function(t){var e=t.media||"all";function a(){t.media=e}t.addEventListener?t.addEventListener("load",a):t.attachEvent&&t.attachEvent("onload",a),setTimeout(function(){t.rel="stylesheet",t.media="only x"}),setTimeout(a,3e3)},o.poly=function(){if(!o.support())for(var t=n.document.getElementsByTagName("link"),e=0;e<t.length;e++){var a=t[e];"preload"!==a.rel||"style"!==a.getAttribute("as")||a.getAttribute("data-loadcss")||(a.setAttribute("data-loadcss",!0),o.bindMediaToggle(a))}},!o.support()){o.poly();var t=n.setInterval(o.poly,500);n.addEventListener?n.addEventListener("load",function(){o.poly(),n.clearInterval(t)}):n.attachEvent&&n.attachEvent("onload",function(){o.poly(),n.clearInterval(t)})}"undefined"!=typeof exports?exports.loadCSS=loadCSS:n.loadCSS=loadCSS}("undefined"!=typeof global?global:this);</script>
+  <title>Restaurant Reviews</title>
+</head>
+
+<body>
+  <header>
+    <nav>
+      <h1><a href="/">Restaurant Reviews</a></h1>
+    </nav>
+  </header>
+
+  <main id="maincontent">
+    <section id="map-container">
+      <h2 class="visually-hidden">Map of restaurant locations</h2>
+      <div id="map" role="application"></div>
+    </section>
+    <section>
+      <h2 class="visually-hidden">List of restaurants</h2>
+      <div class="filter-options">
+        <h3>Filter Results</h3>
+        <label for="neighborhoods-select" class="visually-hidden">Select a neighborhood</label>
+        <select id="neighborhoods-select" name="neighborhoods" onchange="updateRestaurants()">
+          <option value="all">All Neighborhoods</option>
+        </select>
+        <label for="cuisines-select" class="visually-hidden">Select a type of cuisine</label>
+        <select id="cuisines-select" name="cuisines" onchange="updateRestaurants()">
+          <option value="all">All Cuisines</option>
+        </select>
+      </div>
+      <ul id="restaurants-list"></ul>
+    </section>
+  </main>
+
+  <script type="application/javascript" charset="utf-8" src="js/idb.js"></script>
+  <script type="application/javascript" charset="utf-8" src="js/dbhelper.js"></script>
+  <script type="application/javascript" charset="utf-8" src="js/main.js"></script>
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCqVIS10YN2lIIHcRZbLWDtyK5_GD9QkWg&libraries=places&callback=initMap"></script>
+  <script type="application/javascript" charset="utf-8" src="sw.js"></script>
+
+
+  <footer id="footer">
+    Copyright (c) 2017 <a href="/"><strong>Restaurant Reviews</strong></a> All Rights Reserved.
+  </footer>
+
+</body>
+
+</html>

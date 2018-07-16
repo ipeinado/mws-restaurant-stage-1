@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <meta name="theme-color" content="#333333">
+  <!-- Normalize.css for better cross-browser consistency -->
+  <style>
+    @charset "utf-8";body,p{font-family:Arial,Helvetica,sans-serif;font-size:16px;color:#333;line-height:1.5}body{background-color:#fdfdfd;margin:0;position:relative}li,ul{font-family:Arial,Helvetica,sans-serif;font-size:10pt;color:#333}a{color:#d43900;text-decoration:none}h1,h2{font-family:Arial,Helvetica,sans-serif;margin:0 0 20px}footer,header,nav,section{display:block}#maincontent{background-color:#f3f3f3;min-height:100%}#footer{background-color:#444;box-sizing:border-box;color:#ccc;font-size:8pt;letter-spacing:1px;padding:25px;text-align:center;text-transform:uppercase}#footer a{color:#ff977a}nav{width:100%;height:80px;background-color:#252831;text-align:center;display:table}nav h1{display:table-cell;vertical-align:middle;margin:auto}nav h1 a{color:#fff;font-size:14pt;font-weight:200;letter-spacing:10px;text-transform:uppercase}#breadcrumb{padding:10px 40px 16px;list-style:none;background-color:#eee;font-size:17px;margin:0;width:calc(50% - 80px);text-align:left;position:absolute;top:80px;left:0}#breadcrumb li{display:inline}#breadcrumb li a{color:#1e71a9;text-decoration:none}#map{height:400px;width:100%;background-color:#ccc}.inside header{position:fixed;top:0;width:100%;z-index:1000}.inside #map-container{background:#00f none repeat scroll 0 0;height:87%;position:fixed;right:0;top:80px;width:50%}.inside #map{background-color:#ccc;height:100%;width:100%}.inside #footer{bottom:0;position:absolute;width:50%}#restaurant-name{color:#d43900;font-family:Arial,sans-serif;font-size:20pt;font-weight:200;letter-spacing:0;margin:15px 0 30px;text-transform:uppercase;line-height:1.1}#restaurant-img{width:100%}#restaurant-address{font-size:12pt;margin:10px 0}#restaurant-cuisine{background-color:#333;color:#ddd;font-size:12pt;font-weight:300;letter-spacing:10px;margin:0 0 20px;padding:2px 0;text-align:center;text-transform:uppercase;width:100%}#restaurant-container,#reviews-container{border-bottom:1px solid #d9d9d9;border-top:1px solid #fff;box-sizing:border-box;padding:140px 40px 30px;width:50%}#reviews-container{padding:30px 40px 80px}#reviews-list{margin:0;padding:0}@media screen and (max-width:992px){#maincontent{padding-bottom:80px}#breadcrumb{width:100%}.inside #map-container{width:100%;height:40vh;position:relative}#restaurant-container,#reviews-container{width:100%;padding:100px 20px 30px;overflow:hidden}#reviews-container{padding-top:40px}#restaurant-img{width:50%;float:left;margin-right:20px}#restaurant-cuisine{float:left;width:50%}.inside #footer{width:100%;box-sizing:border-box}}@media screen and (max-width:640px){nav h1 a{font-size:18px;letter-spacing:5px}#breadcrumb{padding:10px 15px 16px;font-size:20px}#restaurant-container{box-sizing:border-box}#restaurant-img{width:100%;border-top-left-radius:30px}#restaurant-cuisine{width:100%}}.visually-hidden{border:0;clip:rect(0 0 0 0);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;width:1px}.fav-button{padding:.5em;margin-bottom:1em;border-radius:4px}
+  </style>
+  <link rel="preload" src="//normalize-css.googlecode.com/svn/trunk/normalize.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" src="//normalize-css.googlecode.com/svn/trunk/normalize.css"></noscript>
+  <!-- Main CSS file -->
+  <link rel="preload" href="css/styles.css" type="text/css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="css/styles.css" type="text/css"></noscript>
+  <script>!function(n){"use strict";n.loadCSS||(n.loadCSS=function(){});var o=loadCSS.relpreload={};if(o.support=function(){var e;try{e=n.document.createElement("link").relList.supports("preload")}catch(t){e=!1}return function(){return e}}(),o.bindMediaToggle=function(t){var e=t.media||"all";function a(){t.media=e}t.addEventListener?t.addEventListener("load",a):t.attachEvent&&t.attachEvent("onload",a),setTimeout(function(){t.rel="stylesheet",t.media="only x"}),setTimeout(a,3e3)},o.poly=function(){if(!o.support())for(var t=n.document.getElementsByTagName("link"),e=0;e<t.length;e++){var a=t[e];"preload"!==a.rel||"style"!==a.getAttribute("as")||a.getAttribute("data-loadcss")||(a.setAttribute("data-loadcss",!0),o.bindMediaToggle(a))}},!o.support()){o.poly();var t=n.setInterval(o.poly,500);n.addEventListener?n.addEventListener("load",function(){o.poly(),n.clearInterval(t)}):n.attachEvent&&n.attachEvent("onload",function(){o.poly(),n.clearInterval(t)})}"undefined"!=typeof exports?exports.loadCSS=loadCSS:n.loadCSS=loadCSS}("undefined"!=typeof global?global:this);</script>
+  <link rel="manifest" href="/manifest.json">
+  <title>Restaurant Info</title>
+</head>
+
+<body class="inside">
+  <!-- Beginning header -->
+  <header>
+    <!-- Beginning nav -->
+    <nav>
+      <h1><a href="/">Restaurant Reviews</a></h1>
+
+      <!-- Beginning breadcrumb -->
+      <ul id="breadcrumb" role="breadcrumb">
+        <li><a href="/">Home</a></li>
+      </ul>
+    <!-- End breadcrumb -->
+    </nav>
+    <!-- End nav -->
+  </header>
+  <!-- End header -->
+
+  <!-- Beginning main -->
+  <main id="maincontent">
+    <!-- Beginning map -->
+    <section id="map-container">
+      <h2 class="visually-hidden">Map with location of the Restaurant</h2>
+      <div id="map" role="application"></div>
+    </section>
+    <!-- End map -->
+    <!-- Beginning restaurant -->
+    <section id="restaurant-container">
+      <h2 id="restaurant-name"></h2>
+      <button id="favButton" class="fav-button" role="button"></button>
+      <picture id="restaurant-img"></picture>
+      <p id="restaurant-cuisine"></p>
+      <p id="restaurant-address"></p>
+      <table id="restaurant-hours"></table>
+    </section>
+    <!-- end restaurant -->
+    <!-- Beginning reviews -->
+    <section id="reviews-container">
+      <ul id="reviews-list"></ul>
+      <div id="reviews-form"></div>
+    </section>
+    <!-- End reviews -->
+  </main>
+  <!-- End main -->
+
+  <!-- Beginning footer -->
+  <footer id="footer">
+    Copyright (c) 2017 <a href="/"><strong>Restaurant Reviews</strong></a> All Rights Reserved.
+  </footer>
+  <!-- End footer -->
+
+  <!-- Beginning scripts -->
+  <!-- Database helpers -->
+  <script type="text/javascript" src="js/idb-min.js"></script>
+  <script type="application/javascript" charset="utf-8" src="sw.js"></script>
+  <script type="text/javascript" src="js/dbhelper-min.js"></script>
+  <!-- Main javascript file -->
+  <script type="text/javascript" src="js/restaurant_info-min.js"></script>
+  <!-- Google Maps -->
+  <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCqVIS10YN2lIIHcRZbLWDtyK5_GD9QkWg&libraries=places&callback=initMap"></script>
+
+  <!-- End scripts -->
+
+</body>
+
+</html>
