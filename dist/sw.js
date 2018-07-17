@@ -96,7 +96,6 @@ self.addEventListener('install', (event) => {
 	event.waitUntil(
 		caches.open(CACHE_NAME)
 			.then((cache) => {
-				console.log('Opened cache');
 				return cache.addAll(urlsToCache);
 			})
 	);
@@ -178,6 +177,6 @@ function submitReviews() {
 				}
 			}))
 		})
-		.then(() => console.log('reviews could be sent'))
+		.then(() => console.log('reviews could be sent from service worker'))
 		.catch(err => console.log('There was a problem submitting the reviews: ' + err));;
 }

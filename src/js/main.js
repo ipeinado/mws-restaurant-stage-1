@@ -131,7 +131,6 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
   });
 
   if ("IntersectionObserver" in window) {
-    console.log('Intersection observer in window');
 
     var lazyImages = [].slice.call(document.querySelectorAll(".lazy"));
 
@@ -152,8 +151,6 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
         lazyImageObserver.observe(lazyImage);
       });
     }
-  } else {
-    console.log("Interaction observer is not in window");
   }
 
   addMarkersToMap();
