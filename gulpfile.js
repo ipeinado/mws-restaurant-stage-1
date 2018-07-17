@@ -102,13 +102,12 @@ gulp.task('images', () => {
     	.pipe(gulp.dest('dist/img'));
 });
 
-gulp.task('build', ['critical-index', 'critical-restaurant']);
+gulp.task('build', ['copy', 'images', 'critical-index', 'critical-restaurant']);
 
 gulp.task('watch', () => {
 	gulp.watch('src/css/**/*.css', ['minify-css', 'critical-index', 'critical-restaurant']);
 	gulp.watch(['src/js/**/*.js'], ['compress']);
 	gulp.watch('src/sw.js', ['copy']);
 });
-
 
 gulp.task('default', ['watch']);

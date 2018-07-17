@@ -518,7 +518,7 @@ nav h1 a {
 }
 
 .fav-button.non-favorite>.heart {
-    color: #d43900
+    color: #d43900;
 }
 
 form {

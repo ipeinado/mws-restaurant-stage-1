@@ -141,11 +141,39 @@ createRestaurantHTML = (restaurant) => {
   const image = document.createElement('img');
   image.className = 'restaurant-img';
   const img_name = DBHelper.imageUrlForRestaurant(restaurant);
-  image.src = img_name.split('.')[0] + "-small." + 'jpg';
+  
+  const picture = document.createElement('picture');
 
-  image.setAttribute('srcset', img_name.split('.')[0] + "-small@2x." + img_name.split('.')[1] + ' 2x');
-  image.setAttribute('alt', 'Image of ' + restaurant.name + " Restaurant");
-  li.append(image);
+  const alt_text = 'Image of ' + restaurant.name + ' Restaurant';
+
+  const source_webp = document.createElement('source');
+  const srcset_webp = img_name + '-small.webp 1x, ' + img_name + '-medium.webp 2x';
+  source_webp.setAttribute('type', 'image/webp');
+  source_webp.setAttribute('srcset', srcset_webp);
+  source_webp.setAttribute('alt', alt_text);
+
+  picture.append(source_webp);
+
+  const source_jpeg = document.createElement('source');
+  const srcset_jpeg = img_name + '-small.jpg 1x, ' + img_name + '-medium.jpg 2x';
+  source_jpeg.setAttribute('type', 'image/jpeg');
+  source_jpeg.setAttribute('srcset', srcset_jpeg);
+  source_jpeg.setAttribute('alt', alt_text);
+
+  picture.append(source_jpeg);
+
+  const img = document.createElement('img');
+  img.setAttribute('src', img_name + '-small.jpg');
+  img.setAttribute('alt', alt_text);
+
+  picture.append(img);
+
+  li.append(picture);
+  // image.src = img_name.split('.')[0] + "-small." + 'jpg';
+
+  // image.setAttribute('srcset', img_name.split('.')[0] + "-medium." + img_name.split('.')[1] + ' 2x');
+  // image.setAttribute('alt', 'Image of ' + restaurant.name + " Restaurant");
+  // li.append(image);
 
   const name = document.createElement('h3');
   name.innerHTML = restaurant.name;
