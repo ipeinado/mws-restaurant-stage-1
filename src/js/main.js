@@ -129,6 +129,33 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
   restaurants.forEach(restaurant => {
     ul.append(createRestaurantHTML(restaurant));
   });
+
+  if ("IntersectionObserver" in window) {
+    console.log('Intersection observer in window');
+
+    var lazyImages = [].slice.call(document.querySelectorAll(".lazy"));
+
+    if ("IntersectionObserver" in window) {
+      let lazyImageObserver = new IntersectionObserver(function(entries, observer) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            let lazyImage = entry.target;
+            lazyImage.src = lazyImage.dataset.src;
+            lazyImage.srcset = lazyImage.dataset.srcset;
+            lazyImage.classList.remove("lazy");
+            lazyImageObserver.unobserve(lazyImage);
+          }
+        });
+      });
+
+      lazyImages.forEach(function(lazyImage) {
+        lazyImageObserver.observe(lazyImage);
+      });
+    }
+  } else {
+    console.log("Interaction observer is not in window");
+  }
+
   addMarkersToMap();
 }
 
@@ -148,22 +175,25 @@ createRestaurantHTML = (restaurant) => {
 
   const source_webp = document.createElement('source');
   const srcset_webp = img_name + '-small.webp 1x, ' + img_name + '-medium.webp 2x';
+  source_webp.setAttribute('class', 'lazy');
   source_webp.setAttribute('type', 'image/webp');
-  source_webp.setAttribute('srcset', srcset_webp);
+  source_webp.setAttribute('data-srcset', srcset_webp);
   source_webp.setAttribute('alt', alt_text);
 
   picture.append(source_webp);
 
   const source_jpeg = document.createElement('source');
   const srcset_jpeg = img_name + '-small.jpg 1x, ' + img_name + '-medium.jpg 2x';
+  source_jpeg.setAttribute('class', 'lazy');
   source_jpeg.setAttribute('type', 'image/jpeg');
-  source_jpeg.setAttribute('srcset', srcset_jpeg);
+  source_jpeg.setAttribute('data-srcset', srcset_jpeg);
   source_jpeg.setAttribute('alt', alt_text);
 
   picture.append(source_jpeg);
 
   const img = document.createElement('img');
-  img.setAttribute('src', img_name + '-small.jpg');
+  img.setAttribute('class', 'lazy');
+  img.setAttribute('data-src', img_name + '-small.jpg');
   img.setAttribute('alt', alt_text);
 
   picture.append(img);
