@@ -102,7 +102,7 @@ gulp.task('images', () => {
     	.pipe(gulp.dest('dist/img'));
 });
 
-gulp.task('build', ['copy', 'images', 'critical-index', 'critical-restaurant']);
+gulp.task('build', ['minify-css', 'compress', 'copy', 'images', 'critical-index', 'critical-restaurant']);
 
 gulp.task('watch', () => {
 	gulp.watch('src/css/**/*.css', ['minify-css', 'critical-index', 'critical-restaurant']);
